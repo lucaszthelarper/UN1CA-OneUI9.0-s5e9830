@@ -31,29 +31,12 @@ system/lib64/libssu_keystore2.so
 system/priv-app/SsuService
 "
 
-# Recovery restoration script
-VENDOR_DEBLOAT+="
-recovery-from-boot.p
-bin/install-recovery.sh
-etc/init/vendor_flash_recovery.rc
-"
-
 # PDP apps
 SYSTEM_DEBLOAT+="
 system/preload
 "
 
 truncate -s 0 "$WORK_DIR/system/system/etc/vpl_apks_count_list.txt"
-
-# eSIM
-[[ "$TARGET_COMMON_SUPPORT_EMBEDDED_SIM" == "false" ]] && SYSTEM_DEBLOAT+="
-system/etc/permissions/privapp-permissions-com.samsung.android.app.esimkeystring.xml
-system/etc/permissions/privapp-permissions-com.samsung.euicc.xml
-system/etc/sysconfig/preinstalled-packages-com.samsung.android.app.esimkeystring.xml
-system/etc/sysconfig/preinstalled-packages-com.samsung.euicc.xml
-system/priv-app/EsimKeyString
-system/priv-app/EuiccService
-"
 
 # SmartFPSAdjuster
 [ "$TARGET_LCD_CONFIG_HFR_MODE" -lt "1" ] && SYSTEM_DEBLOAT+="
@@ -63,43 +46,6 @@ system/priv-app/IntelligentDynamicFpsService
 # Application recommendations
 SYSTEM_DEBLOAT+="
 system/app/MAPSAgent
-"
-
-# Korean carrier apps and stores. Keep telephony, IMS, CSC and USIM services.
-# SetupWizard skips carrier location consent when its app is not installed.
-SYSTEM_DEBLOAT+="
-system/app/HpsAgreement_new
-system/app/KTAuth_Stub
-system/app/KTCustomerService
-system/app/LGUMiniCustomerCenter
-system/app/SKTMemberShip_new
-system/app/TWorld
-system/etc/permissions/privapp-permissions-com.kt.serviceagent.xml
-system/etc/permissions/privapp-permissions-com.lguplus.appstore.xml
-system/etc/permissions/privapp-permissions-com.lguplus.lgugpsnwps.xml
-system/etc/permissions/privapp-permissions-com.samsung.hidden.LGU.xml
-system/etc/permissions/privapp-permissions-com.samsung.hidden.SKT.xml
-system/etc/permissions/privapp-permissions-com.skt.hps20client.xml
-system/etc/permissions/privapp-permissions-com.skt.prod.dialer.xml
-system/etc/permissions/privapp-permissions-com.skt.skaf.A000Z00040.xml
-system/etc/permissions/privapp-permissions-com.skt.skaf.OA00018282.xml
-system/etc/permissions/privapp-permissions-com.skt.skaf.OA00199800.xml
-system/etc/permissions/privapp-permissions-com.skt.t_smart_charge.xml
-system/priv-app/HPSClient
-system/priv-app/KT114Provider2
-system/priv-app/KTHiddenMenu
-system/priv-app/KTOneStore
-system/priv-app/KTServiceAgent
-system/priv-app/KTServiceMenu
-system/priv-app/LGUGPSnWPS
-system/priv-app/LGUHiddenMenu
-system/priv-app/LGUOZStore
-system/priv-app/OneStoreService
-system/priv-app/SKTHiddenMenu
-system/priv-app/SKTOneStore
-system/priv-app/SmartPush_64
-system/priv-app/TPhoneOnePackage
-system/priv-app/TService
 "
 
 # AppUpdateCenter
@@ -159,28 +105,8 @@ SYSTEM_DEBLOAT+="
 system/app/PlayAutoInstallConfig
 "
 
-# HwModuleTest
-SYSTEM_DEBLOAT+="
-system/app/Cameralyzer
-system/app/FactoryAirCommandManager
-system/app/FactoryCameraFB
-system/app/HMT
-system/app/WlanTest
-system/etc/default-permissions/default-permissions-com.sec.factory.cameralyzer.xml
-system/etc/permissions/privapp-permissions-com.samsung.android.providers.factory.xml
-system/etc/permissions/privapp-permissions-com.sec.facatfunction.xml
-system/priv-app/FacAtFunction
-system/priv-app/FactoryTestProvider
-"
-
 # Language packs
 SYSTEM_DEBLOAT+="$(find "$WORK_DIR/system" -type d -name "*TTSVoice*" | sed "s|$WORK_DIR/system/||g")"
-
-# LED Cover Service
-[ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_FRAMEWORK_CONFIG_NFC_LED_COVER_LEVEL")" -lt "30" ] && SYSTEM_DEBLOAT+="
-system/etc/permissions/privapp-permissions-com.sec.android.cover.ledcover.xml
-system/priv-app/LedCoverService
-"
 
 # Link to Windows
 # Replace full apk with stub apk to save space
@@ -345,12 +271,6 @@ system/hidden/SmartTutor
 "
 
 SET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_COMMON_CONFIG_SMARTTUTOR_PACKAGES_PATH" --delete
-
-# Software update
-SYSTEM_DEBLOAT+="
-system/etc/permissions/privapp-permissions-com.wssyncmldm.xml
-system/priv-app/FotaAgent
-"
 
 # SVC Agent
 SYSTEM_DEBLOAT+="
