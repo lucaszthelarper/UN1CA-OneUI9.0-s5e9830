@@ -1,9 +1,9 @@
 # Copyright (c) 2025 Salvo Giangreco
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# UN1CA configuration file for Snapdragon devices (qssi)
+# UN1CA configuration file for Exynos devices (essi)
 
-# Galaxy S24 Ultra (Snapdragon) (One UI 9)
+# Galaxy S24 Ultra (Snapdragon) (One UI 9.0)
 SOURCE_FIRMWARE="SM-S928B/INS/353956351058884"
 SOURCE_EXTRA_FIRMWARES=()
 SOURCE_PLATFORM_SDK_VERSION=37
