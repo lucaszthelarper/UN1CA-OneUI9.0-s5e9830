@@ -40,13 +40,6 @@ system/priv-app/sec_camerax_service
 system/priv-app/VideoScan
 "
 
-# Wi-Fi Hotspot Overlays
-PRODUCT_DEBLOAT+="
-overlay/SoftapOverlay6GHz
-overlay/SoftapOverlayDualAp
-overlay/SoftapOverlayOWE
-"
-
 # StorageShare (kSMBd)
 SYSTEM_DEBLOAT+="
 system/bin/ksmbd.addshare
