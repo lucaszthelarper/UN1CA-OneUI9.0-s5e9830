@@ -55,12 +55,6 @@ if [ "$(GET_FLOATING_FEATURE_CONFIG "SEC_FLOATING_FEATURE_GRAPHICS_SUPPORT_3D_SU
 fi
 LOG_STEP_OUT
 
-if [ "$SOURCE_PLATFORM_SDK_VERSION" -ge 37 ]; then
-    LOG "- Converting legacy camera recording defaults to explicit 30 fps"
-    sed -i -E '/name="(BACK|FRONT)_CAMERA_RECORDING_DEFAULT_RESOLUTION"/s/(value="[0-9]+x[0-9]+)_AUTO"/\1"/' \
-        "$WORK_DIR/system/system/cameradata/camera-feature.xml"
-fi
-
 # Samsung Camera "hal3_mass-phone-release" app flavor
 if ! $SOURCE_CAMERA_SUPPORT_MASS_APP_FLAVOR; then
     if $TARGET_CAMERA_SUPPORT_MASS_APP_FLAVOR; then
@@ -355,15 +349,35 @@ fi
 while IFS= read -r f; do
     HEX_PATCH "$f" "726f2e70726f647563742e6d6f64656c00" "726f2e626f6f742e656d2e6d6f64656c00"
 done < <(grep -r -w -l "ro.product.model" "$WORK_DIR/vendor" | grep "camera")
-while IFS= read -r f; do
-    HEX_PATCH "$f" "726f2e70726f647563742e6d6f64656c00" "726f2e626f6f742e656d2e6d6f64656c00"
-done < <(grep -l -w "ro.product.model" \
-    "$WORK_DIR/system/system/lib/libstagefright.so" \
-    "$WORK_DIR/system/system/lib64/libstagefright.so")
+if [ -f "$WORK_DIR/system/system/lib/libstagefright.so" ]; then
+    HEX_PATCH "$WORK_DIR/system/system/lib/libstagefright.so" \
+        "726f2e70726f647563742e6d6f64656c00" "726f2e626f6f742e656d2e6d6f64656c00"
+else
+    # Android 16 source firmware (for example S926B) is arm64-only and does
+    # not ship the legacy 32-bit stagefright library.
+    LOG "- Skipping 32-bit libstagefright model patch (library is absent)"
+fi
+if [ -f "$WORK_DIR/system/system/lib64/libstagefright.so" ]; then
+    HEX_PATCH "$WORK_DIR/system/system/lib64/libstagefright.so" \
+        "726f2e70726f647563742e6d6f64656c00" "726f2e626f6f742e656d2e6d6f64656c00"
+    # Fix the ARM64 __fread_chk buffer overflow in
+    # ACodec::reconfigEncoder4OtherApps.
+    # Source platform's ACodec reads 512 bytes into a 255-byte buffer via __fread_chk,
+    # causing SIGABRT in mediaserver when third-party apps (WhatsApp/Telegram) use
+    # the video encoder. Patch the read size from 0x200 to 0xff to match the buffer.
+    HEX_PATCH "$WORK_DIR/system/system/lib64/libstagefright.so" \
+        "02408052e30314aae41f8052" "e21f8052e30314aae41f8052"
+else
+    LOG "- Skipping 64-bit libstagefright model patch (library is absent)"
+fi
 
 # Fix object capture
 if [[ "$TARGET_OS_SINGLE_SYSTEM_IMAGE" == "essi" ]]; then
-    if {
+    if [[ "$TARGET_PLATFORM" == "exynos990" ]] && \
+            cmp -s "$WORK_DIR/system/system/lib64/libobjectcapture_jni.arcsoft.so" \
+                "$SRC_DIR/platform/exynos990/patches/camera/system/lib64/libobjectcapture_jni.arcsoft.so"; then
+        LOG "- Object capture already uses the Exynos 990 target-compatible blob"
+    elif {
         [[ "$(GET_PROP "system" "ro.product.device")" =~ r0|g0|b0 ]] && \
             ! [[ "$(GET_PROP "vendor" "ro.product.vendor.device")" =~ r0|g0|b0 ]]
     } || {
