@@ -1,0 +1,6 @@
+id=media_surface_compat
+name=Legacy OMX output Surface compatibility
+version=v1
+versionCode=1
+author=MinsOS, GoRhanHee
+description=Use a placeholder Surface instead of unsupported detached output on the SM8250 OMX codecs, and preserve buffer generations when reconnecting a Surface.

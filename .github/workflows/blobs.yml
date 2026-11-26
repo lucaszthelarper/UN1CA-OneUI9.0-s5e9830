@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       device:
-        description: Prebuilt device to update, or all
+        description: Prebuilt device to update, overseas (S20 inputs), or all
         type: string
         default: all
         required: true
@@ -33,7 +33,7 @@ jobs:
         env:
           DEVICE: ${{ inputs.device || 'all' }}
         run: |
-          MATRIX=$(jq -c --arg device "$DEVICE" '{include: [.[] | select($device == "all" or .device == $device)]}' .github/prebuilt-firmwares.json)
+          MATRIX=$(jq -c --arg device "$DEVICE" '{include: [.[] | select($device == "all" or .device == $device or .group == $device)]}' .github/prebuilt-firmwares.json)
           jq -e '.include | length > 0' <<< "$MATRIX" > /dev/null
           echo "matrix=$MATRIX" >> "$GITHUB_OUTPUT"
 
@@ -143,9 +143,9 @@ jobs:
           compression-level: 0
 
       - name: Create Pull Request
-        continue-on-error: true
         uses: peter-evans/create-pull-request@v8
         with:
+          base: ${{ github.event.repository.default_branch }}
           add-paths: |
             prebuilts/samsung/${{ matrix.device }}
           commit-message: 'prebuilts/samsung/${{ matrix.device }}: update blobs to ${{ env.PDA_BUILD }}'

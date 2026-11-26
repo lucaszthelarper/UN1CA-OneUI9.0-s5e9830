@@ -105,6 +105,12 @@ SYSTEM_DEBLOAT+="
 system/app/PlayAutoInstallConfig
 "
 
+<<<<<<< HEAD
+=======
+# Keep HwModuleTest (HMT), its test helpers and permission allowlists for the
+# dialer's *#0*# hardware diagnostics menu.
+
+>>>>>>> upstream/seventeen
 # Language packs
 SYSTEM_DEBLOAT+="$(find "$WORK_DIR/system" -type d -name "*TTSVoice*" | sed "s|$WORK_DIR/system/||g")"
 
